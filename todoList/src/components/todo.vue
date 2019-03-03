@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import Store from '../store'
 import Item from './item.vue'
 import Tabs from './tabs.vue'
 let id = 0;
@@ -14,7 +15,7 @@ export default{
 	name: 'todo',
 	data (){
 		return {
-			todos:[],
+			todos:Store.fetch(),
 			filter:'all'
 		}
 	},
@@ -28,20 +29,35 @@ export default{
 			return this.todos.filter(todo => todo.isCompleted === completed)
 		}
 	},
+	watch:{
+		todos:{
+			handler:function(val){
+					this.todos = val;
+					console.log('changed')
+					Store.save(this.todos);
+				},
+			deep:true
+			}
+	},
 	methods:{
 		addL: function(event){
 			
-			this.todos.unshift({id: id++, content: event.target.value.trim(), isCompleted:false})
+			this.todos.unshift({id: id++, content: event.target.value.trim(), isCompleted:false});
+			Store.save(this.todos);
 			event.target.value = ''
 		},
 		deleteL (id){
-			this.todos.splice(this.todos.findIndex(todo => todo.id ===id),1)
+			this.todos.splice(this.todos.findIndex(todo => todo.id ===id),1);
+			Store.save(this.todos);
 		},
 		toggleFilter(state){
 			this.filter = state;
 		},
 		deleteAllCompleted(){
-			this.todos = this.todos.filter(todo => todo.isCompleted === false)		}
+			this.todos = this.todos.filter(todo => todo.isCompleted === false);		
+			Store.save(this.todos);
+		}
+			
 	}
 }
 </script>
